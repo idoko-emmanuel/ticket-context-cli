@@ -19,7 +19,7 @@ jobs:
                 php-version: ${{ env.PHP_VERSION }}
                 tools: composer
             - name: Install dependencies
-              run: composer install --optimize-autoloader
+              run: composer install --optimize-autoloader --ignore-platform-reqs --ignore-platform-reqs
             - name: Run Pint
               run: vendor/bin/pint --test
 
@@ -44,7 +44,7 @@ jobs:
                 restore-keys: |
                     composer-
             - name: Install dependencies
-              run: composer install --optimize-autoloader
+              run: composer install --optimize-autoloader --ignore-platform-reqs
             - name: Run unit tests
               run: php artisan test --testsuite=Unit
 
@@ -69,7 +69,7 @@ jobs:
                 restore-keys: |
                     composer-
             - name: Install dependencies
-              run: composer install --optimize-autoloader
+              run: composer install --optimize-autoloader --ignore-platform-reqs
             - name: Prepare application
               run: |
                   php -r "file_exists('.env') || copy('.env.example', '.env');"
