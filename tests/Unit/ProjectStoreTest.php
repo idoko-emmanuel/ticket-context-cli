@@ -183,6 +183,8 @@ it('getCurrentBranch returns branch name inside a git repo', function (): void {
     // Initialise a real git repo in tempDir
     exec('git init '.escapeshellarg($this->tempDir).' 2>&1');
     exec('git -C '.escapeshellarg($this->tempDir).' checkout -b main 2>&1');
+    exec('git -C '.escapeshellarg($this->tempDir).' config user.email "test@example.com" 2>&1');
+    exec('git -C '.escapeshellarg($this->tempDir).' config user.name "Test" 2>&1');
     // Need at least one commit for HEAD to resolve
     exec('git -C '.escapeshellarg($this->tempDir).' commit --allow-empty -m "init" 2>&1');
 

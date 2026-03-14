@@ -75,7 +75,7 @@ You will be prompted for:
 
 | Prompt | Example | Where to find it |
 | --- | --- | --- |
-| Atlassian subdomain | `lantansquad` | Your Jira URL: `https://lantansquad.atlassian.net` |
+| Atlassian subdomain | `your-org` | Your Jira URL: `https://your-org.atlassian.net` |
 | Jira account email | `you@company.com` | The email you log into Jira with |
 | API token | `ATATTx...` | [id.atlassian.com/manage-profile/security/api-tokens](https://id.atlassian.com/manage-profile/security/api-tokens) |
 
@@ -105,7 +105,7 @@ This creates `.ticket-context.json` in the repo root and adds `.claude/skills/ti
 Your project key is the prefix of every ticket — e.g. `LTN` from `LTN-42`. You can also find it in your Jira board URL:
 
 ```text
-https://lantansquad.atlassian.net/jira/software/c/projects/LTN/boards/34
+https://your-org.atlassian.net/jira/software/c/projects/LTN/boards/34
                                                               ^^^
 ```
 
@@ -240,6 +240,28 @@ You can also reference a context file explicitly at any time:
 | `.ticket-context.json` | Project key + branch→ticket mappings | No |
 | `.claude/skills/ticket-context/SKILL.md` | Claude skill definition (auto-generated) | No |
 | `.claude/skills/ticket-context/*-context.md` | Generated context Markdown files | No (gitignored) |
+
+---
+
+## Contributing
+
+1. Create a feature branch from `main`:
+
+    ```bash
+    git checkout main
+    git pull
+    git checkout -b feat/your-feature-name
+    ```
+
+2. Make your changes and commit them.
+
+3. Push your branch and open a pull request against `main`:
+
+    ```bash
+    git push -u origin feat/your-feature-name
+    ```
+
+4. Ensure the CI checks (lint, unit tests, feature tests) pass before requesting a review.
 
 ---
 
