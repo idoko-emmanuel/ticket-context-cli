@@ -12,6 +12,10 @@ use Tests\TestCase;
 
 uses(TestCase::class);
 
+beforeEach(function (): void {
+    Http::preventStrayRequests();
+});
+
 /** Build a JiraService backed by a fake ConfigStore with known credentials. */
 function makeJira(string $baseUrl = 'https://acme.atlassian.net'): JiraService
 {
