@@ -14,7 +14,7 @@ use Symfony\Component\Console\Command\Command as SymfonyCommand;
  * Lists all Jira tickets assigned to the current user in the active sprint.
  * Automatically scoped to the linked project when run inside a linked directory.
  */
-class SpoolSprint extends Command
+class TixSprint extends TixCommand
 {
     /** @var string */
     protected $signature = 'tix:sprint

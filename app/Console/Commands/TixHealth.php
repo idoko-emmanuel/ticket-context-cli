@@ -14,7 +14,7 @@ use Symfony\Component\Console\Command\Command as SymfonyCommand;
 /**
  * Displays configuration status and tests the live Jira connection.
  */
-class SpoolHealth extends Command
+class TixHealth extends TixCommand
 {
     /** @var string */
     protected $signature = 'tix:health';

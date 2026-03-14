@@ -108,6 +108,65 @@ class JiraService
     }
 
     /**
+     * Transition an issue to the named status.
+     *
+     * Fetches available transitions and posts the first whose name matches
+     * $toStatus (case-insensitive). Returns true if the transition was applied,
+     * false if no matching transition was found (e.g. already in that status).
+     *
+     * @throws RuntimeException
+     */
+    public function transitionIssue(string $key, string $toStatus): bool
+    {
+        $data = $this->request("/rest/api/3/issue/{$key}/transitions");
+        $transitions = $data['transitions'] ?? [];
+
+        $transition = null;
+        foreach ($transitions as $t) {
+            if (strtolower((string) ($t['name'] ?? '')) === strtolower($toStatus)) {
+                $transition = $t;
+                break;
+            }
+        }
+
+        if ($transition === null) {
+            return false;
+        }
+
+        $this->post("/rest/api/3/issue/{$key}/transitions", [
+            'transition' => ['id' => $transition['id']],
+        ]);
+
+        return true;
+    }
+
+    /**
+     * Return the unique status names available in a Jira project, sorted alphabetically.
+     *
+     * @return string[]
+     *
+     * @throws RuntimeException
+     */
+    public function getProjectStatuses(string $projectKey): array
+    {
+        $issueTypes = $this->request("/rest/api/3/project/{$projectKey}/statuses");
+
+        $statuses = [];
+        foreach ($issueTypes as $issueType) {
+            foreach ($issueType['statuses'] ?? [] as $status) {
+                $name = (string) ($status['name'] ?? '');
+                if ($name !== '' && ! \in_array($name, $statuses, true)) {
+                    $statuses[] = $name;
+                }
+            }
+        }
+
+        sort($statuses);
+
+        return $statuses;
+    }
+
+    /**
      * Extract all comments from an issue, returning them in chronological order.
      *
      * @param  array<string, mixed>  $issue

@@ -6,7 +6,6 @@ namespace App\Console\Commands;
 
 use App\Services\JiraService;
 use App\Services\ProjectStore;
-use Illuminate\Console\Command;
 use RuntimeException;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Process\Process;
@@ -15,12 +14,13 @@ use Symfony\Component\Process\Process;
  * Creates a git feature branch, links one or more tickets to it,
  * and saves full context to a Markdown file.
  */
-class SpoolBranch extends Command
+class TixBranch extends TixCommand
 {
     /** @var string */
     protected $signature = 'tix:branch
                             {keys* : One or more Jira issue keys, e.g. PROJ-123 PROJ-124}
-                            {--no-branch : Skip git branch creation and only save context file}';
+                            {--no-branch : Skip git branch creation and only save context file}
+                            {--transition= : Transition ticket(s) to this status, e.g. "In Progress"}';
 
     /** @var string */
     protected $description = 'Create a git branch, link ticket(s) to it, and save context to a Markdown file';
@@ -53,6 +53,7 @@ class SpoolBranch extends Command
 
         try {
             $primaryIssue = $this->jira->getIssue($primaryKey);
+            $this->maybeTransition($primaryIssue, $primaryKey);
         } catch (RuntimeException $e) {
             $this->error($e->getMessage());
 
@@ -80,8 +81,8 @@ class SpoolBranch extends Command
         }
 
         // Build and save context for all tickets.
-        /** @var SpoolContext $contextCommand */
-        $contextCommand = app(SpoolContext::class);
+        /** @var TixContext $contextCommand */
+        $contextCommand = app(TixContext::class);
 
         $markdown = \count($keys) === 1
             ? $contextCommand->buildMarkdown($primaryIssue, $primaryKey)
@@ -89,8 +90,6 @@ class SpoolBranch extends Command
 
         file_put_contents($filename, $markdown);
         $this->info('Context saved to '.ProjectStore::CONTEXT_DIR.'/'.$primaryKey.'-context.md');
-
-        $this->ensureClaudeSkill();
 
         return SymfonyCommand::SUCCESS;
     }
@@ -102,7 +101,7 @@ class SpoolBranch extends Command
      * @param  array<string, mixed>  $primaryIssue
      */
     private function buildMultiTicketMarkdown(
-        SpoolContext $contextCommand,
+        TixContext $contextCommand,
         array $keys,
         array $primaryIssue,
         string $primaryKey,
@@ -116,6 +115,7 @@ class SpoolBranch extends Command
 
             try {
                 $issue = $this->jira->getIssue($key);
+                $this->maybeTransition($issue, $key);
                 $sections[] = $contextCommand->buildMarkdown($issue, $key);
             } catch (RuntimeException $e) {
                 $this->warn("Could not fetch {$key}: ".$e->getMessage());
@@ -126,46 +126,33 @@ class SpoolBranch extends Command
     }
 
     /**
-     * Write SKILL.md into the context directory so Claude Code automatically
-     * loads ticket context at the start of every session.
-     * Skips silently if no project root is available or the file already exists.
+     * Transition a ticket to the status given by --transition, if the flag was provided.
+     *
+     * @param  array<string, mixed>  $issue
      */
-    private function ensureClaudeSkill(): void
+    private function maybeTransition(array $issue, string $key): void
     {
-        if ($this->project->getProjectRoot() === null) {
+        $toStatus = (string) $this->option('transition');
+
+        if ($toStatus === '') {
             return;
         }
 
-        $skillFile = $this->project->getContextDir().'/SKILL.md';
+        $currentStatus = (string) ($issue['fields']['status']['name'] ?? '');
 
-        if (file_exists($skillFile)) {
-            return;
+        try {
+            $transitioned = $this->jira->transitionIssue($key, $toStatus);
+
+            if ($transitioned) {
+                $this->info("Moved {$key} to {$toStatus}.");
+            } elseif (strtolower($currentStatus) === strtolower($toStatus)) {
+                $this->line("{$key} is already {$currentStatus}.");
+            } else {
+                $this->warn("{$key}: no transition to \"{$toStatus}\" available from \"{$currentStatus}\".");
+            }
+        } catch (RuntimeException $e) {
+            $this->warn("Could not transition {$key}: ".$e->getMessage());
         }
-
-        file_put_contents($skillFile, $this->claudeSkillContent());
-        $this->info('Claude skill created at '.ProjectStore::CONTEXT_DIR.'/SKILL.md');
-    }
-
-    /**
-     * Return the SKILL.md content for the ticket-context Claude skill.
-     */
-    private function claudeSkillContent(): string
-    {
-        return <<<'SKILL'
----
-name: ticket-context
-description: "Loads Jira ticket context from .claude/skills/ticket-context/ at session start to inform feature work."
-license: MIT
-metadata:
-  author: ticket-context-cli
----
-
-# Ticket Context
-
-At the start of a session, check if any `*-context.md` files exist in
-`.claude/skills/ticket-context/`. If found, read them — they describe the current ticket(s)
-being worked on for this branch.
-SKILL;
     }
 
     /**

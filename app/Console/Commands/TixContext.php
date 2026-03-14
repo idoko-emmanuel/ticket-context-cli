@@ -16,11 +16,12 @@ use Symfony\Component\Console\Command\Command as SymfonyCommand;
  * When called with no key, auto-detects tickets from the current git branch
  * via .ticket-context.json.
  */
-class SpoolContext extends Command
+class TixContext extends TixCommand
 {
     /** @var string */
     protected $signature = 'tix:context
-                            {keys?* : Jira issue key(s), e.g. PROJ-123. Omit to use current branch tickets.}';
+                            {keys?* : Jira issue key(s), e.g. PROJ-123. Omit to use current branch tickets.}
+                            {--transition= : Transition ticket(s) to this status, e.g. "In Progress"}';
 
     /** @var string */
     protected $description = 'Fetch and format full ticket context as Markdown — perfect for pasting into Claude';
@@ -55,6 +56,7 @@ class SpoolContext extends Command
 
             try {
                 $issue = $this->jira->getIssue($key);
+                $this->maybeTransition($issue, $key);
                 $sections[$key] = $this->buildMarkdown($issue, $key);
             } catch (RuntimeException $e) {
                 $this->error("Could not fetch {$key}: ".$e->getMessage());
@@ -104,6 +106,36 @@ class SpoolContext extends Command
         }
 
         return $linked;
+    }
+
+    /**
+     * Transition a ticket to the status given by --transition, if the flag was provided.
+     *
+     * @param  array<string, mixed>  $issue
+     */
+    private function maybeTransition(array $issue, string $key): void
+    {
+        $toStatus = (string) $this->option('transition');
+
+        if ($toStatus === '') {
+            return;
+        }
+
+        $currentStatus = (string) ($issue['fields']['status']['name'] ?? '');
+
+        try {
+            $transitioned = $this->jira->transitionIssue($key, $toStatus);
+
+            if ($transitioned) {
+                $this->info("Moved {$key} to {$toStatus}.");
+            } elseif (strtolower($currentStatus) === strtolower($toStatus)) {
+                $this->line("{$key} is already {$currentStatus}.");
+            } else {
+                $this->warn("{$key}: no transition to \"{$toStatus}\" available from \"{$currentStatus}\".");
+            }
+        } catch (RuntimeException $e) {
+            $this->warn("Could not transition {$key}: ".$e->getMessage());
+        }
     }
 
     /**

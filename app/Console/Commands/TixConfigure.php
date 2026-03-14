@@ -17,7 +17,7 @@ use function Laravel\Prompts\text;
 /**
  * Interactively configure Jira credentials and persist them to the global config.
  */
-class SpoolConfigure extends Command
+class TixConfigure extends TixCommand
 {
     /** @var string */
     protected $signature = 'tix:configure';

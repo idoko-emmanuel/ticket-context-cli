@@ -12,7 +12,7 @@ use Symfony\Component\Console\Command\Command as SymfonyCommand;
  * Links the current directory to a Jira project by creating .ticket-context.json
  * and ensures .ticket-context/ is added to the project's .gitignore.
  */
-class SpoolLink extends Command
+class TixLink extends TixCommand
 {
     /** @var string */
     protected $signature = 'tix:link

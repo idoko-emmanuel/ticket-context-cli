@@ -45,8 +45,8 @@ Add this to your `~/.zshrc` or `~/.bashrc`:
 unalias tix 2>/dev/null
 tix() {
   local cmd="${1:-}"
-  if [[ -z "$cmd" || "$cmd" == -* ]]; then
-    php ~/ticket-context-cli/artisan list tix
+  if [[ -z "$cmd" || "$cmd" == "--help" || "$cmd" == "-h" || "$cmd" == "help" ]]; then
+    php ~/ticket-context-cli/artisan tix:help
   else
     php ~/ticket-context-cli/artisan "tix:${cmd}" "${@:2}"
   fi
@@ -134,6 +134,12 @@ This will:
 - Fetch the full ticket from Jira and save it to `.claude/skills/ticket-context/LTN-42-context.md`
 - Create `.claude/skills/ticket-context/SKILL.md` so Claude loads the context automatically
 
+#### Also transition the ticket when branching
+
+```bash
+tix branch LTN-42 --transition="In Progress"
+```
+
 #### Link multiple tickets to one branch
 
 ```bash
@@ -161,13 +167,38 @@ tix context LTN-42
 tix context LTN-42 LTN-43
 ```
 
+Optionally transition at the same time:
+
+```bash
+tix context --transition="In Review"
+```
+
+### 4. Move a ticket to a different status
+
+```bash
+tix move In Progress
+```
+
+Auto-detects tickets from the current branch and moves all of them. You can also pass explicit keys — no quotes needed for multi-word statuses:
+
+```bash
+tix move LTN-42 In Review
+tix move LTN-42 LTN-43 Done
+```
+
+### 5. Check available statuses
+
+```bash
+tix statuses
+```
+
+Lists all statuses available in the linked project — useful when you're not sure of the exact name to pass to `--transition` or `tix move`.
+
 ---
 
 ## Claude Code integration
 
-### Automatic setup via `tix branch`
-
-When you run `tix branch`, a Claude skill file is automatically written to `.claude/skills/ticket-context/SKILL.md` in your project root (if it doesn't already exist). Claude Code reads skills from `.claude/skills/` by default, so ticket context will be loaded automatically at the start of every session in that project — no manual configuration needed.
+A Claude skill file is automatically written to `.claude/skills/ticket-context/SKILL.md` the first time any `tix` command is run in a linked project. Claude Code reads skills from `.claude/skills/` at session start, so ticket context is loaded automatically — no manual configuration needed.
 
 ### Manual use
 
@@ -183,6 +214,7 @@ You can also reference a context file explicitly at any time:
 
 | Command | Description |
 | --- | --- |
+| `tix help` | Show all commands and their options |
 | `tix configure` | Set Jira credentials interactively |
 | `tix health` | Check config status and test connection |
 | `tix link <PROJECT-KEY>` | Link current directory to a Jira project |
@@ -191,8 +223,12 @@ You can also reference a context file explicitly at any time:
 | `tix sprint --json` | Output raw JSON |
 | `tix branch <KEY> [KEY...]` | Create branch, link ticket(s), save context file(s) |
 | `tix branch <KEY> --no-branch` | Skip branch creation, only save context |
+| `tix branch <KEY> --transition=STATUS` | Also transition ticket(s) to a status |
 | `tix context` | Fetch and save context for current branch's linked tickets |
 | `tix context <KEY> [KEY...]` | Fetch and save context for specific ticket(s) |
+| `tix context --transition=STATUS` | Also transition ticket(s) to a status |
+| `tix move [KEY...] <STATUS>` | Move ticket(s) to a status (auto-detects from branch) |
+| `tix statuses [PROJECT]` | List available statuses for the project |
 
 ---
 
@@ -201,8 +237,8 @@ You can also reference a context file explicitly at any time:
 | File | Purpose | Committed? |
 | --- | --- | --- |
 | `~/.config/ticket-context/config.json` | Global Jira credentials | Never |
-| `.ticket-context.json` | Project key + branch→ticket mappings | Yes (optional) |
-| `.claude/skills/ticket-context/SKILL.md` | Claude skill definition | Yes |
+| `.ticket-context.json` | Project key + branch→ticket mappings | No |
+| `.claude/skills/ticket-context/SKILL.md` | Claude skill definition (auto-generated) | No |
 | `.claude/skills/ticket-context/*-context.md` | Generated context Markdown files | No (gitignored) |
 
 ---
