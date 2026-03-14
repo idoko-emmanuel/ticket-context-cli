@@ -63,7 +63,7 @@ If you already have Composer installed and prefer managing tools through it:
 composer global require idoko-emmanuel/ticket-context-cli
 ```
 
-> **Note:** The package must be available on [Packagist](https://packagist.org) for this to work. After installing, ensure `~/.composer/vendor/bin` is in your `PATH`.
+> Ensure `~/.composer/vendor/bin` is in your `PATH` after installing.
 
 ### Manual install
 
