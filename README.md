@@ -2,6 +2,8 @@
 
 [![PHP Version](https://img.shields.io/badge/php-8.2%2B-blue)](https://www.php.net/)
 [![Laravel](https://img.shields.io/badge/laravel-12.x-red)](https://laravel.com)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/idoko-emmanuel/ticket-context-cli)](https://packagist.org/packages/idoko-emmanuel/ticket-context-cli)
+[![Total Downloads](https://img.shields.io/packagist/dt/idoko-emmanuel/ticket-context-cli)](https://packagist.org/packages/idoko-emmanuel/ticket-context-cli)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Install](https://img.shields.io/badge/Install-curl%20%7C%20bash-brightgreen)](https://github.com/idoko-emmanuel/ticket-context-cli#installation)
 
