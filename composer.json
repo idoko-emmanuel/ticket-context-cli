@@ -1,13 +1,20 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/laravel",
+    "name": "idoko-emmanuel/ticket-context-cli",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "CLI tool that pulls Jira sprint tickets and generates rich Markdown context files for Claude Code and other AI coding assistants.",
     "keywords": [
-        "laravel",
-        "framework"
+        "jira",
+        "claude",
+        "cli",
+        "ai",
+        "context",
+        "laravel"
     ],
     "license": "MIT",
+    "bin": [
+        "bin/tix"
+    ],
     "require": {
         "php": "^8.2",
         "laravel/framework": "^12.0",
