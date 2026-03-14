@@ -18,15 +18,41 @@ Run it from **any project repo** on your machine. It automatically scopes to the
 
 ## Requirements
 
-- PHP 8.2+
-- Composer
+- PHP 8.2+ — [php.net/downloads](https://php.net/downloads) or via your package manager
+- Composer — [getcomposer.org/download](https://getcomposer.org/download) (the install script handles this automatically)
 - Git
 
 ---
 
 ## Installation
 
-### 1. Clone and install
+### One-line install
+
+The install script checks for PHP, installs Composer if it's missing, clones the repo, sets everything up, and adds the `tix` shell function automatically.
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/idoko-emmanuel/ticket-context-cli/main/install.sh | bash
+```
+
+Then reload your shell:
+
+```bash
+source ~/.zshrc   # or ~/.bashrc
+```
+
+### Manual install
+
+If you prefer to run each step yourself:
+
+#### 1. Install Composer (skip if already installed)
+
+```bash
+php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+php composer-setup.php && rm composer-setup.php
+sudo mv composer.phar /usr/local/bin/composer
+```
+
+#### 2. Clone and install
 
 ```bash
 git clone https://github.com/idoko-emmanuel/ticket-context-cli.git ~/ticket-context-cli
@@ -36,7 +62,7 @@ cp .env.example .env
 php artisan key:generate
 ```
 
-### 2. Add the global shell function
+#### 3. Add the global shell function
 
 Add this to your `~/.zshrc` or `~/.bashrc`:
 
