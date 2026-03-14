@@ -160,16 +160,17 @@ it('shows error and exits FAILURE when git branch creation fails', function (): 
     $this->jira->shouldReceive('descriptionAsMarkdown')->andReturn('desc');
     $this->jira->shouldReceive('extractComments')->andReturn([]);
 
-    // Bind a mock Process that fails
-    $this->mock(Process::class, function ($mock) {
-        $mock->shouldReceive('run')->andReturn(1);
-        $mock->shouldReceive('isSuccessful')->andReturn(false);
-        $mock->shouldReceive('getErrorOutput')->andReturn('branch already exists');
-    });
+    // Run from a non-git directory so `git checkout -b` fails naturally.
+    $originalCwd = (string) getcwd();
+    chdir($this->tempDir);
 
-    $this->artisan('tix:branch', ['keys' => ['PROJ-1']])
-        ->expectsOutputToContain('Git branch creation failed')
-        ->assertFailed();
+    try {
+        $this->artisan('tix:branch', ['keys' => ['PROJ-1']])
+            ->expectsOutputToContain('Git branch creation failed')
+            ->assertFailed();
+    } finally {
+        chdir($originalCwd);
+    }
 });
 
 // ─── 10.8 Primary ticket API failure ─────────────────────────────────────
