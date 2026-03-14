@@ -19,9 +19,8 @@ use Symfony\Component\Console\Command\Command as SymfonyCommand;
 class SpoolContext extends Command
 {
     /** @var string */
-    protected $signature = 'spool:context
-                            {keys?* : Jira issue key(s), e.g. PROJ-123. Omit to use current branch tickets.}
-                            {--file : Save context to a Markdown file in the current directory}';
+    protected $signature = 'tix:context
+                            {keys?* : Jira issue key(s), e.g. PROJ-123. Omit to use current branch tickets.}';
 
     /** @var string */
     protected $description = 'Fetch and format full ticket context as Markdown — perfect for pasting into Claude';
@@ -42,7 +41,7 @@ class SpoolContext extends Command
 
         if (empty($keys)) {
             $this->error('No ticket keys provided and none linked to the current branch.');
-            $this->info('Run: spool context <KEY>  or  spool branch <KEY> to link one first.');
+            $this->info('Run: tix context <KEY>  or  tix branch <KEY> to link one first.');
 
             return SymfonyCommand::FAILURE;
         }
@@ -66,15 +65,10 @@ class SpoolContext extends Command
 
         $markdown = implode("\n\n---\n\n", $sections);
 
-        $this->line('');
-        $this->line($markdown);
-
-        if ($this->option('file')) {
-            $contextDir = $this->project->getContextDir();
-            $filename = "{$contextDir}/".strtoupper($primaryKey).'-context.md';
-            file_put_contents($filename, $markdown);
-            $this->info('Context saved to '.ProjectStore::CONTEXT_DIR.'/'.strtoupper($primaryKey).'-context.md');
-        }
+        $contextDir = $this->project->getContextDir();
+        $filename = "{$contextDir}/".strtoupper($primaryKey).'-context.md';
+        file_put_contents($filename, $markdown);
+        $this->info('Context saved to '.ProjectStore::CONTEXT_DIR.'/'.strtoupper($primaryKey).'-context.md');
 
         return SymfonyCommand::SUCCESS;
     }

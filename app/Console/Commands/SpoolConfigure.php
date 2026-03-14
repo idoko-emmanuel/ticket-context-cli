@@ -20,7 +20,7 @@ use function Laravel\Prompts\text;
 class SpoolConfigure extends Command
 {
     /** @var string */
-    protected $signature = 'spool:configure';
+    protected $signature = 'tix:configure';
 
     /** @var string */
     protected $description = 'Set up your Jira credentials (saved to ~/.config/ticket-context/config.json)';
@@ -98,7 +98,7 @@ class SpoolConfigure extends Command
             return SymfonyCommand::SUCCESS;
         } catch (RuntimeException $e) {
             $this->error('Connection failed: '.$e->getMessage());
-            $this->info('Your credentials were saved — re-run spool configure to correct them.');
+            $this->info('Your credentials were saved — re-run tix configure to correct them.');
 
             return SymfonyCommand::FAILURE;
         }

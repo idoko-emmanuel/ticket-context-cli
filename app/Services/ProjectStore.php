@@ -26,8 +26,8 @@ class ProjectStore
 {
     private const CONFIG_FILE = '.ticket-context.json';
 
-    /** Directory (relative to project root) where context files are stored. */
-    public const CONTEXT_DIR = '.ticket-context';
+    /** Directory (relative to project root) where context files and the Claude skill are stored. */
+    public const CONTEXT_DIR = '.claude/skills/ticket-context';
 
     /** Absolute path to the discovered .ticket-context.json, or null if none found. */
     private ?string $projectConfigPath;

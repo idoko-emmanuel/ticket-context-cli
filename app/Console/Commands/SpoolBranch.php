@@ -18,7 +18,7 @@ use Symfony\Component\Process\Process;
 class SpoolBranch extends Command
 {
     /** @var string */
-    protected $signature = 'spool:branch
+    protected $signature = 'tix:branch
                             {keys* : One or more Jira issue keys, e.g. PROJ-123 PROJ-124}
                             {--no-branch : Skip git branch creation and only save context file}';
 
@@ -76,7 +76,7 @@ class SpoolBranch extends Command
             $this->project->linkTicketsToBranch($activeBranch, $keys);
             $this->info('Linked '.implode(', ', $keys)." → branch '{$activeBranch}'");
         } else {
-            $this->warn('No .ticket-context.json found — ticket not persisted. Run: spool link <PROJECT-KEY>');
+            $this->warn('No .ticket-context.json found — ticket not persisted. Run: tix link <PROJECT-KEY>');
         }
 
         // Build and save context for all tickets.
@@ -89,6 +89,8 @@ class SpoolBranch extends Command
 
         file_put_contents($filename, $markdown);
         $this->info('Context saved to '.ProjectStore::CONTEXT_DIR.'/'.$primaryKey.'-context.md');
+
+        $this->ensureClaudeSkill();
 
         return SymfonyCommand::SUCCESS;
     }
@@ -121,6 +123,49 @@ class SpoolBranch extends Command
         }
 
         return implode("\n\n---\n\n", $sections);
+    }
+
+    /**
+     * Write SKILL.md into the context directory so Claude Code automatically
+     * loads ticket context at the start of every session.
+     * Skips silently if no project root is available or the file already exists.
+     */
+    private function ensureClaudeSkill(): void
+    {
+        if ($this->project->getProjectRoot() === null) {
+            return;
+        }
+
+        $skillFile = $this->project->getContextDir().'/SKILL.md';
+
+        if (file_exists($skillFile)) {
+            return;
+        }
+
+        file_put_contents($skillFile, $this->claudeSkillContent());
+        $this->info('Claude skill created at '.ProjectStore::CONTEXT_DIR.'/SKILL.md');
+    }
+
+    /**
+     * Return the SKILL.md content for the ticket-context Claude skill.
+     */
+    private function claudeSkillContent(): string
+    {
+        return <<<'SKILL'
+---
+name: ticket-context
+description: "Loads Jira ticket context from .claude/skills/ticket-context/ at session start to inform feature work."
+license: MIT
+metadata:
+  author: ticket-context-cli
+---
+
+# Ticket Context
+
+At the start of a session, check if any `*-context.md` files exist in
+`.claude/skills/ticket-context/`. If found, read them — they describe the current ticket(s)
+being worked on for this branch.
+SKILL;
     }
 
     /**

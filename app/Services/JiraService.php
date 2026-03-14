@@ -64,10 +64,10 @@ class JiraService
             $jql = "project = {$projectKey} AND ".$jql;
         }
 
-        $response = $this->request('/rest/api/3/search', [
+        $response = $this->post('/rest/api/3/search/jql', [
             'jql' => $jql,
             'maxResults' => 50,
-            'fields' => 'summary,status,issuetype,priority,assignee',
+            'fields' => ['summary', 'status', 'issuetype', 'priority', 'assignee'],
         ]);
 
         return $response['issues'] ?? [];
@@ -133,6 +133,33 @@ class JiraService
     }
 
     /**
+     * Send an authenticated POST request to the Jira REST API.
+     *
+     * @param  array<string, mixed>  $body
+     * @return array<string, mixed>
+     *
+     * @throws RuntimeException
+     */
+    private function post(string $path, array $body = []): array
+    {
+        if (empty($this->baseUrl) || empty($this->email) || empty($this->token)) {
+            throw new RuntimeException('Jira is not configured. Run: tix configure');
+        }
+
+        try {
+            $response = Http::withBasicAuth($this->email, $this->token)
+                ->acceptJson()
+                ->post("{$this->baseUrl}{$path}", $body);
+        } catch (ConnectionException $e) {
+            throw new RuntimeException("Could not connect to Jira: {$e->getMessage()}");
+        }
+
+        $this->assertSuccessful($response, $path);
+
+        return $response->json() ?? [];
+    }
+
+    /**
      * Send an authenticated GET request to the Jira REST API.
      *
      * @param  array<string, mixed>  $query
@@ -144,7 +171,7 @@ class JiraService
     {
         if (empty($this->baseUrl) || empty($this->email) || empty($this->token)) {
             throw new RuntimeException(
-                'Jira is not configured. Run: spool configure'
+                'Jira is not configured. Run: tix configure'
             );
         }
 
@@ -175,7 +202,7 @@ class JiraService
         $status = $response->status();
 
         $message = match ($status) {
-            401 => 'Authentication failed — check your email and API token (run: spool configure).',
+            401 => 'Authentication failed — check your email and API token (run: tix configure).',
             403 => 'Permission denied — your account may lack access to this resource.',
             404 => "Not found: {$path}",
             429 => 'Rate limited by Jira — please wait a moment and try again.',

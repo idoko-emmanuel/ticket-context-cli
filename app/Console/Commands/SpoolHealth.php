@@ -17,7 +17,7 @@ use Symfony\Component\Console\Command\Command as SymfonyCommand;
 class SpoolHealth extends Command
 {
     /** @var string */
-    protected $signature = 'spool:health';
+    protected $signature = 'tix:health';
 
     /** @var string */
     protected $description = 'Check Jira configuration status and test the connection';
@@ -48,7 +48,7 @@ class SpoolHealth extends Command
         $this->printRow('  API Token', ! empty($credentials['token']) ? str_repeat('*', 8) : '—');
 
         $configured = $this->config->isConfigured();
-        $this->printStatus('  Credentials', $configured, 'saved', 'not set — run: spool configure');
+        $this->printStatus('  Credentials', $configured, 'saved', 'not set — run: tix configure');
         $this->info('');
 
         // --- Live connection test ---
@@ -79,10 +79,10 @@ class SpoolHealth extends Command
             if ($branch !== null) {
                 $tickets = $this->project->getTicketsForBranch($branch);
                 $this->printRow('  Current branch', $branch);
-                $this->printRow('  Linked tickets', ! empty($tickets) ? implode(', ', $tickets) : 'none — run: spool branch <KEY>');
+                $this->printRow('  Linked tickets', ! empty($tickets) ? implode(', ', $tickets) : 'none — run: tix branch <KEY>');
             }
         } else {
-            $this->printStatus('  Project linked', false, '', 'no .ticket-context.json found — run: spool link <PROJECT-KEY>');
+            $this->printStatus('  Project linked', false, '', 'no .ticket-context.json found — run: tix link <PROJECT-KEY>');
         }
 
         $this->info('');

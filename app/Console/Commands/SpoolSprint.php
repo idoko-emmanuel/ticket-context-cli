@@ -17,7 +17,7 @@ use Symfony\Component\Console\Command\Command as SymfonyCommand;
 class SpoolSprint extends Command
 {
     /** @var string */
-    protected $signature = 'spool:sprint
+    protected $signature = 'tix:sprint
                             {--all : Ignore project filter and show all active sprint tickets}
                             {--json : Output raw JSON instead of a table}';
 
