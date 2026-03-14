@@ -27,6 +27,8 @@ Now one command (`tix branch LTN-42`) creates the branch, fetches the full ticke
 {project-root}/.claude/skills/ticket-context/     ← SKILL.md + generated context .md files
 ```
 
+![Demo](demo.gif)
+
 ---
 
 ## Requirements
