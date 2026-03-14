@@ -89,6 +89,20 @@ You can now run `tix <command>` from any directory on your machine.
 
 ---
 
+## Uninstallation
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/idoko-emmanuel/ticket-context-cli/main/uninstall.sh | bash
+```
+
+This will:
+
+- Remove `~/.local/share/ticket-context-cli`
+- Remove the `tix` shell function from `~/.zshrc` / `~/.bashrc`
+- Prompt whether to also delete your saved Jira credentials (`~/.config/ticket-context/`)
+
+---
+
 ## Setup
 
 ### Configure your Jira credentials
