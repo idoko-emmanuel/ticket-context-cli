@@ -5,7 +5,7 @@ set -euo pipefail
 #  ticket-context-cli — one-time installer
 # ─────────────────────────────────────────────
 
-INSTALL_DIR="$HOME/ticket-context-cli"
+INSTALL_DIR="$HOME/.local/share/ticket-context-cli"
 REPO_URL="https://github.com/idoko-emmanuel/ticket-context-cli.git"
 
 # ── helpers ──────────────────────────────────
@@ -99,9 +99,9 @@ unalias tix 2>/dev/null
 tix() {
   local cmd="${1:-}"
   if [[ -z "$cmd" || "$cmd" == "--help" || "$cmd" == "-h" || "$cmd" == "help" ]]; then
-    php ~/ticket-context-cli/artisan tix:help
+    php ~/.local/share/ticket-context-cli/artisan tix:help
   else
-    php ~/ticket-context-cli/artisan "tix:${cmd}" "${@:2}"
+    php ~/.local/share/ticket-context-cli/artisan "tix:${cmd}" "${@:2}"
   fi
 }'
 

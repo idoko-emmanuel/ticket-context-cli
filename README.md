@@ -55,8 +55,8 @@ sudo mv composer.phar /usr/local/bin/composer
 #### 2. Clone and install
 
 ```bash
-git clone https://github.com/idoko-emmanuel/ticket-context-cli.git ~/ticket-context-cli
-cd ~/ticket-context-cli
+git clone https://github.com/idoko-emmanuel/ticket-context-cli.git ~/.local/share/ticket-context-cli
+cd ~/.local/share/ticket-context-cli
 composer install --no-dev
 cp .env.example .env
 php artisan key:generate
@@ -72,9 +72,9 @@ unalias tix 2>/dev/null
 tix() {
   local cmd="${1:-}"
   if [[ -z "$cmd" || "$cmd" == "--help" || "$cmd" == "-h" || "$cmd" == "help" ]]; then
-    php ~/ticket-context-cli/artisan tix:help
+    php ~/.local/share/ticket-context-cli/artisan tix:help
   else
-    php ~/ticket-context-cli/artisan "tix:${cmd}" "${@:2}"
+    php ~/.local/share/ticket-context-cli/artisan "tix:${cmd}" "${@:2}"
   fi
 }
 ```
@@ -86,6 +86,20 @@ source ~/.zshrc
 ```
 
 You can now run `tix <command>` from any directory on your machine.
+
+---
+
+## Uninstallation
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/idoko-emmanuel/ticket-context-cli/main/uninstall.sh | bash
+```
+
+This will:
+
+- Remove `~/.local/share/ticket-context-cli`
+- Remove the `tix` shell function from `~/.zshrc` / `~/.bashrc`
+- Prompt whether to also delete your saved Jira credentials (`~/.config/ticket-context/`)
 
 ---
 
