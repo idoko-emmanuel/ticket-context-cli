@@ -159,19 +159,27 @@ spool context LTN-42 LTN-43 --file
 
 ## Claude Code integration
 
-Reference the context file directly in your Claude session:
+### One-time setup — update your global Claude skill
 
-```text
-@.ticket-context/LTN-42-context.md implement the feature described in this ticket
-```
-
-To make it automatic for every project, add to your `~/.claude/CLAUDE.md`:
+Open (or create) `~/.claude/CLAUDE.md` and add the following block:
 
 ```markdown
 ## Ticket Context
-At the start of a session, check if any `*-context.md` files exist in
-`.ticket-context/`. If found, read them — they describe the current ticket(s)
-being worked on for this branch.
+At the start of every session, check if a `.ticket-context/` directory exists
+in the project root. If it does, read all `*-context.md` files inside it —
+they contain the Jira ticket context for the current branch and should inform
+everything you do in this session: the feature goal, acceptance criteria,
+and any relevant comments from the team.
+```
+
+This makes Claude automatically load your ticket context on every session start, in every project that has been linked with `spool link`.
+
+### Manual use
+
+You can also reference a context file explicitly at any time:
+
+```text
+@.ticket-context/LTN-42-context.md implement the feature described in this ticket
 ```
 
 ---
