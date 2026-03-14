@@ -16,7 +16,7 @@ success() { echo "  ✓ $*"; }
 confirm() {
   local prompt="$1"
   read -r -p "  $prompt [y/N] " reply
-  [[ "${reply,,}" == "y" ]]
+  [[ "$reply" == [yY] ]]
 }
 
 # ── 1. Remove app directory ──────────────────
