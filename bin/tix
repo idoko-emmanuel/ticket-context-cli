@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+#
+# bin/tix — wrapper for global Composer installs
+# When installed via `composer global require`, this script is symlinked
+# into ~/.composer/vendor/bin/tix and dispatches to the Laravel artisan commands.
+
+APP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+# Bootstrap on first run (no .env means the app has never been set up)
+if [[ ! -f "$APP_DIR/.env" ]]; then
+    echo "ticket-context-cli: first-run setup..."
+    cp "$APP_DIR/.env.example" "$APP_DIR/.env"
+    php "$APP_DIR/artisan" key:generate --ansi
+    php "$APP_DIR/artisan" migrate --force --ansi
+    echo ""
+fi
+
+cmd="${1:-}"
+
+if [[ -z "$cmd" || "$cmd" == "--help" || "$cmd" == "-h" || "$cmd" == "help" ]]; then
+    php "$APP_DIR/artisan" tix:help
+else
+    php "$APP_DIR/artisan" "tix:${cmd}" "${@:2}"
+fi

@@ -1,8 +1,21 @@
 # ticket-context-cli
 
+[![PHP Version](https://img.shields.io/badge/php-8.2%2B-blue)](https://www.php.net/)
+[![Laravel](https://img.shields.io/badge/laravel-12.x-red)](https://laravel.com)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Install](https://img.shields.io/badge/Install-curl%20%7C%20bash-brightgreen)](https://github.com/idoko-emmanuel/ticket-context-cli#installation)
+
 A personal CLI tool that pulls your active Jira sprint tickets and generates rich Markdown context files optimised for pasting into Claude Code (or any AI coding assistant).
 
 Run it from **any project repo** on your machine. It automatically scopes to the right Jira project and git branch.
+
+---
+
+## Why this tool?
+
+Switching to a new ticket used to mean 5 browser tabs open, copy-pasting ticket details into Claude, manually creating a branch, and hoping I hadn't missed any acceptance criteria.
+
+Now one command (`tix branch LTN-42`) creates the branch, fetches the full ticket, and saves a structured Markdown context file. Claude Code reads it automatically at session start via its skills system — so the AI already knows exactly what I'm building before I type a word.
 
 ---
 
@@ -39,6 +52,16 @@ Then reload your shell:
 ```bash
 source ~/.zshrc   # or ~/.bashrc
 ```
+
+### Alternative: Composer global install
+
+If you already have Composer installed and prefer managing tools through it:
+
+```bash
+composer global require idoko-emmanuel/ticket-context-cli
+```
+
+> **Note:** The package must be available on [Packagist](https://packagist.org) for this to work. After installing, ensure `~/.composer/vendor/bin` is in your `PATH`.
 
 ### Manual install
 
