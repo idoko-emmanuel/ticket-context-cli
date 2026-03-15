@@ -108,11 +108,15 @@ tix() {
 add_to_rc() {
   local rc_file="$1"
   if grep -q 'ticket-context-cli' "$rc_file" 2>/dev/null; then
-    info "Shell function already present in $rc_file — skipping"
-  else
-    printf '\n%s\n' "$SHELL_FUNCTION" >> "$rc_file"
-    success "Shell function added to $rc_file"
+    # Remove the old block so we can write a fresh, correct version
+    local tmp
+    tmp=$(mktemp)
+    awk '/# ticket-context-cli/,/^}$/ { next } { print }' "$rc_file" > "$tmp"
+    mv "$tmp" "$rc_file"
+    info "Replaced existing shell function in $rc_file"
   fi
+  printf '\n%s\n' "$SHELL_FUNCTION" >> "$rc_file"
+  success "Shell function added to $rc_file"
 }
 
 if [[ "${SHELL:-}" == *zsh* ]]; then
